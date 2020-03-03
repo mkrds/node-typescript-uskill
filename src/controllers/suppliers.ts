@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { ObjectId } from "mongodb";
 import { db } from "../../mongodb";
 
 export const getSuppliers = async (
@@ -9,7 +10,6 @@ export const getSuppliers = async (
     .collection("suppliers")
     .find({})
     .toArray();
-  console.log(suppliersArray);
   res.send(suppliersArray);
 };
 
@@ -17,39 +17,50 @@ export const getSupplier = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const id = req.params["id"];
+  const { id } = req.params;
   const suppliersArray = await db
     .collection("suppliers")
-    .find({ _id: id })
+    .find({ _id: new ObjectId(id) })
     .toArray();
-
   res.send(suppliersArray);
 };
 
-export const addSupplier = (
+export const addSupplier = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const requestBody = req.body;
+  res: Response
+): Promise<void> => {
+  try {
+    const { ops } = await db.collection("suppliers").insertOne(req.body);
+    res.send(ops[0]);
+  } catch (e) {
+    res.send(e);
+  }
 };
 
-export const editSupplier = (
+export const editSupplier = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const id = req.params["id"];
-  const requestBody = req.body;
+  res: Response
+): Promise<void> => {
+  try {
+    await db.collection("suppliers").updateOne(
+      { _id: new ObjectId(req.params.id) },
+      {
+        $set: { type: req.body.type }
+      }
+    );
+    res.send("done");
+  } catch (e) {
+    res.send(e);
+  }
 };
 
 export const deleteSupplier = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const id = req.params["id"];
+  const { id } = req.params;
   try {
-    await db.collection("suppliers").remove({ _id: id });
+    await db.collection("suppliers").deleteOne({ _id: new ObjectId(id) });
   } catch (e) {}
   res.end();
 };

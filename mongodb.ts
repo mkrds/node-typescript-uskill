@@ -1,21 +1,25 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, Db } from "mongodb";
+import config from "./config";
 
-// Connection URL
-const url = "mongodb://localhost:27017";
+let db: Db;
 
-// Database Name
-const dbName = "local";
+const connectToDB = (): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    MongoClient.connect(
+      `mongodb://${config.db.host}:${config.db.port}`,
+      { useNewUrlParser: true },
+      (err, client: MongoClient) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log("Connected successfully to Database");
 
-// Use connect method to connect to the server
-let db;
-
-const connectToDB = (): void =>
-  MongoClient.connect(url, (err, client) => {
-    if (err) throw err;
-
-    console.log("Connected successfully to Database");
-
-    db = client.db(dbName);
+          db = client.db(config.db.name);
+          resolve();
+        }
+      }
+    );
   });
+};
 
 export { db, connectToDB };
