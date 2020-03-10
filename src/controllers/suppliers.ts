@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { db } from "../../mongodb";
 
