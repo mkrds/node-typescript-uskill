@@ -1,11 +1,20 @@
+import envalid from "envalid";
+const { str } = envalid;
+const env = envalid.cleanEnv(process.env, {
+  APP_PORT: str({ default: "3000" }),
+  DB_HOST: str({ default: "localhost" }),
+  DB_PORT: str({ default: "27017" }),
+  DB_NAME: str({ default: "local" })
+});
+
 const config = {
   app: {
-    port: parseInt(process.env.APP_PORT) || 3000
+    port: env.APP_PORT
   },
   db: {
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT) || 27017,
-    name: process.env.DB_NAME || "local"
+    host: env.DB_HOST,
+    port: env.DB_PORT,
+    name: env.DB_NAME
   }
 };
 

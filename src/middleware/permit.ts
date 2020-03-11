@@ -1,11 +1,13 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
+
+import { AppRole, AuthorizedRequest } from "../../types";
 
 const permit = (
-  ...allowed: [string]
-): ((req: Request, res: Response, next: NextFunction) => void) => {
-  const isAllowed = (role: string): boolean => allowed.indexOf(role) > -1;
+  ...allowed: [AppRole]
+): ((req: AuthorizedRequest, res: Response, next: NextFunction) => void) => {
+  const isAllowed = (role: AppRole): boolean => allowed.indexOf(role) > -1;
 
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: AuthorizedRequest, res: Response, next: NextFunction): void => {
     if (req.user && isAllowed(req.user.role)) {
       next();
     } else {
